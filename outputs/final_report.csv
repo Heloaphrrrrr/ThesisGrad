@@ -1,0 +1,11 @@
+metric,value
+total_issues,2067.0
+issue_type_invalid,1122.0
+issue_type_missing,667.0
+issue_type_anomaly,278.0
+severity_high,1469.0
+severity_medium,577.0
+severity_critical,17.0
+severity_low,4.0
+average_confidence,0.8056
+fixable_rate,1.0

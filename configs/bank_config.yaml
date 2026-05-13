@@ -1,0 +1,67 @@
+table_name: bank_transactions
+id_column: transaction_id
+
+model:
+  contamination: 0.08
+  n_estimators: 200
+  max_samples: 256
+  random_state: 42
+  knn_neighbors: 5
+  feature_z_threshold: 2.5
+  conservative_confidence_threshold: 0.85
+
+columns:
+  transaction_id:
+    dtype: id
+    required: true
+    use_for_detection: false
+    use_for_recommendation: false
+
+  date:
+    dtype: date
+    required: true
+    use_for_detection: false
+    use_for_recommendation: false
+    severity_if_missing: high
+    severity_if_invalid: high
+
+  domain:
+    dtype: categorical
+    required: true
+    allowed_values:
+      - RESTAURANT
+      - INVESTMENTS
+      - RETAIL
+      - INTERNATIONAL
+      - PUBLIC
+      - MEDICAL
+      - EDUCATION
+    severity_if_missing: medium
+    severity_if_invalid: medium
+
+  location:
+    dtype: categorical
+    required: true
+    severity_if_missing: medium
+    severity_if_invalid: medium
+
+  value:
+    dtype: numeric
+    required: true
+    min_value: 0
+    severity_if_missing: high
+    severity_if_invalid: high
+
+  transaction_count:
+    dtype: numeric
+    required: true
+    min_value: 0
+    severity_if_missing: high
+    severity_if_invalid: high
+
+  avg_transaction_value:
+    dtype: numeric
+    required: false
+    min_value: 0
+    use_for_detection: true
+    use_for_recommendation: true

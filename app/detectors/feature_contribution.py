@@ -1,58 +1,94 @@
 import pandas as pd
-from sklearn.ensemble import IsolationForest
+from sklearn.neighbors import NearestNeighbors
 
 from app.config import PipelineConfig
 from app.preprocessing.feature_builder import FeatureBuilder
 
 
-class AnomalyDetector:
+class FeatureContributionAnalyzer:
     """
-    Isolation Forest để detect anomaly theo row
+    Xác định column nào gây anomaly.
+
+    AnomalyDetector chỉ cho biết row nào bất thường.
+    FeatureContributionAnalyzer giúp phân tích row đó để tìm column nghi ngờ.
     """
 
     def __init__(self, config: PipelineConfig):
         self.config = config
-
-        self.model = IsolationForest(
-            n_estimators=config.n_estimators,
-            contamination=config.contamination,
-            max_samples=config.max_samples,
-            random_state=config.random_state,
-        )
-
         self.feature_builder = FeatureBuilder(config)
-        self._fitted = False
+        self.nn = NearestNeighbors(n_neighbors=config.knn_neighbors)
 
-    def fit(self, df: pd.DataFrame):
-        """
-        Train model
-        """
-        self.feature_builder.fit(df)
-        X = self.feature_builder.transform(df)
+        self.reference_df: pd.DataFrame | None = None
 
-        self.model.fit(X)
-        self._fitted = True
+    def fit(self, reference_df: pd.DataFrame):
+        self.reference_df = reference_df.copy()
+
+        self.feature_builder.fit(reference_df)
+        X_ref = self.feature_builder.transform(reference_df)
+
+        self.nn.fit(X_ref)
 
         return self
 
-    def predict_scores(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Predict anomaly score + label
-        """
+    def find_suspicious_columns(
+        self,
+        row_df: pd.DataFrame,
+        candidate_columns: list[str],
+    ) -> list[str]:
 
-        if not self._fitted:
-            raise ValueError("Model must be fitted before predict.")
+        if self.reference_df is None:
+            raise ValueError("FeatureContributionAnalyzer must be fitted first.")
 
-        X = self.feature_builder.transform(df)
+        X_row = self.feature_builder.transform(row_df)
 
-        raw_scores = self.model.score_samples(X)
-        decision_scores = self.model.decision_function(X)
-        labels = self.model.predict(X)  # -1 = anomaly
+        _, indices = self.nn.kneighbors(X_row)
 
-        result = df[[self.config.id_column]].copy()
+        neighbor_rows = self.reference_df.iloc[indices[0]]
 
-        result["raw_score"] = raw_scores
-        result["decision_score"] = decision_scores
-        result["is_anomaly"] = (labels == -1).astype(int)
+        suspicious_cols = []
 
-        return result
+        for col in candidate_columns:
+            if col not in row_df.columns:
+                continue
+
+            value = row_df.iloc[0][col]
+            rule = self.config.rules[col]
+
+            if pd.isna(value):
+                suspicious_cols.append(col)
+                continue
+
+            if rule.dtype == "numeric":
+                neighbor_values = pd.to_numeric(
+                    neighbor_rows[col],
+                    errors="coerce"
+                ).dropna()
+
+                if len(neighbor_values) < 2:
+                    continue
+
+                mean_val = neighbor_values.mean()
+                std_val = neighbor_values.std(ddof=0)
+
+                try:
+                    current_value = float(value)
+                except Exception:
+                    suspicious_cols.append(col)
+                    continue
+
+                if std_val == 0:
+                    if abs(current_value - mean_val) > 0:
+                        suspicious_cols.append(col)
+                else:
+                    z_score = abs((current_value - mean_val) / std_val)
+
+                    if z_score >= self.config.feature_z_threshold:
+                        suspicious_cols.append(col)
+
+            elif rule.dtype == "categorical":
+                mode_val = neighbor_rows[col].mode(dropna=True)
+
+                if not mode_val.empty and value != mode_val.iloc[0]:
+                    suspicious_cols.append(col)
+
+        return suspicious_cols

@@ -1,132 +1,50 @@
 import pandas as pd
+from sklearn.ensemble import IsolationForest
 
 from app.config import PipelineConfig
-from app.utils import safe_to_numeric
+from app.preprocessing.feature_builder import FeatureBuilder
 
 
-class InvalidDetector:
+class AnomalyDetector:
     """
-    Detect invalid data dựa trên rule:
-    - numeric: min_value / max_value
-    - categorical: allowed_values
-    - date: parse lỗi
+    Isolation Forest để detect anomaly theo row.
     """
 
     def __init__(self, config: PipelineConfig):
         self.config = config
 
-    def detect(self, df: pd.DataFrame) -> pd.DataFrame:
-        records = []
+        self.model = IsolationForest(
+            n_estimators=config.n_estimators,
+            contamination=config.contamination,
+            max_samples=config.max_samples,
+            random_state=config.random_state,
+        )
 
-        for col, rule in self.config.rules.items():
-            if col not in df.columns:
-                continue
+        self.feature_builder = FeatureBuilder(config)
+        self._fitted = False
 
-            if rule.dtype == "id":
-                continue
+    def fit(self, df: pd.DataFrame):
+        self.feature_builder.fit(df)
+        X = self.feature_builder.transform(df)
 
-            series = df[col]
+        self.model.fit(X)
+        self._fitted = True
 
-            if rule.dtype == "numeric":
-                records.extend(self._detect_numeric_invalid(df, col, series, rule))
+        return self
 
-            elif rule.dtype == "categorical":
-                records.extend(self._detect_categorical_invalid(df, col, series, rule))
+    def predict_scores(self, df: pd.DataFrame) -> pd.DataFrame:
+        if not self._fitted:
+            raise ValueError("AnomalyDetector must be fitted before predict_scores().")
 
-            elif rule.dtype == "date":
-                records.extend(self._detect_date_invalid(df, col, series))
+        X = self.feature_builder.transform(df)
 
-        return pd.DataFrame(records, columns=self.config.issue_output_columns)
+        raw_scores = self.model.score_samples(X)
+        decision_scores = self.model.decision_function(X)
+        labels = self.model.predict(X)
 
-    def _detect_numeric_invalid(self, df, col, series, rule):
-        records = []
-        numeric_series = safe_to_numeric(series)
+        result = df[[self.config.id_column]].copy()
+        result["raw_score"] = raw_scores
+        result["decision_score"] = decision_scores
+        result["is_anomaly"] = (labels == -1).astype(int)
 
-        non_missing_mask = ~series.isna()
-
-        # Nếu có giá trị không convert được sang số, coi là invalid
-        invalid_type_mask = non_missing_mask & numeric_series.isna()
-
-        for idx in df.index[invalid_type_mask]:
-            records.append({
-                "row_id": df.at[idx, self.config.id_column],
-                "column_name": col,
-                "issue_type": "invalid",
-                "current_value": df.at[idx, col],
-                "anomaly_score": None,
-                "suggested_value": None,
-                "reason": f"Column '{col}' must be numeric.",
-                "source_method": "rule_invalid_detector",
-            })
-
-        if rule.min_value is not None:
-            mask = numeric_series < rule.min_value
-            for idx in df.index[mask.fillna(False)]:
-                records.append({
-                    "row_id": df.at[idx, self.config.id_column],
-                    "column_name": col,
-                    "issue_type": "invalid",
-                    "current_value": df.at[idx, col],
-                    "anomaly_score": None,
-                    "suggested_value": None,
-                    "reason": f"Value is smaller than minimum allowed: {rule.min_value}.",
-                    "source_method": "rule_invalid_detector",
-                })
-
-        if rule.max_value is not None:
-            mask = numeric_series > rule.max_value
-            for idx in df.index[mask.fillna(False)]:
-                records.append({
-                    "row_id": df.at[idx, self.config.id_column],
-                    "column_name": col,
-                    "issue_type": "invalid",
-                    "current_value": df.at[idx, col],
-                    "anomaly_score": None,
-                    "suggested_value": None,
-                    "reason": f"Value is larger than maximum allowed: {rule.max_value}.",
-                    "source_method": "rule_invalid_detector",
-                })
-
-        return records
-
-    def _detect_categorical_invalid(self, df, col, series, rule):
-        records = []
-
-        if not rule.allowed_values:
-            return records
-
-        mask = ~series.isna() & ~series.isin(rule.allowed_values)
-
-        for idx in df.index[mask]:
-            records.append({
-                "row_id": df.at[idx, self.config.id_column],
-                "column_name": col,
-                "issue_type": "invalid",
-                "current_value": df.at[idx, col],
-                "anomaly_score": None,
-                "suggested_value": None,
-                "reason": f"Value is not in allowed values: {rule.allowed_values}.",
-                "source_method": "rule_invalid_detector",
-            })
-
-        return records
-
-    def _detect_date_invalid(self, df, col, series):
-        records = []
-
-        parsed = pd.to_datetime(series, errors="coerce")
-        mask = ~series.isna() & parsed.isna()
-
-        for idx in df.index[mask]:
-            records.append({
-                "row_id": df.at[idx, self.config.id_column],
-                "column_name": col,
-                "issue_type": "invalid",
-                "current_value": df.at[idx, col],
-                "anomaly_score": None,
-                "suggested_value": None,
-                "reason": f"Column '{col}' has invalid date format.",
-                "source_method": "rule_invalid_detector",
-            })
-
-        return records
+        return result

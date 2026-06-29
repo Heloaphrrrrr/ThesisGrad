@@ -40,6 +40,7 @@ def load_config_from_yaml(path: str | None) -> PipelineConfig:
         table_name=raw["table_name"],
         id_column=raw["id_column"],
         rules=rules,
+        source_query=raw.get("source_query"),
         contamination=model_cfg.get("contamination", 0.08),
         n_estimators=model_cfg.get("n_estimators", 200),
         max_samples=model_cfg.get("max_samples", 256),

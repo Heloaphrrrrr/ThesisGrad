@@ -5,6 +5,10 @@ import numpy as np
 import pandas as pd
 
 
+def parse_ecommerce_invoice_date(series: pd.Series) -> pd.Series:
+    return pd.to_datetime(series, errors="coerce", dayfirst=True)
+
+
 def normalize_empty_strings(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
 
@@ -80,6 +84,96 @@ def add_bank_derived_features(df: pd.DataFrame) -> pd.DataFrame:
     if "value" in out.columns and "transaction_count" in out.columns:
         denom = out["transaction_count"].replace(0, np.nan)
         out["avg_transaction_value"] = out["value"] / denom
+
+    return out
+
+
+def add_ecommerce_derived_features(df: pd.DataFrame) -> pd.DataFrame:
+    out = df.copy()
+
+    rename_map = {
+        "INVOICE_NO": "invoice_no",
+        "CUSTOM_ID": "customer_id",
+        "GENDER": "gender",
+        "AGE": "age",
+        "CATEGORY": "category",
+        "QUANTITY": "quantity",
+        "PRICE": "price",
+        "PAYMENT_METHOD": "payment_method",
+        "INVOICE_DATE": "invoice_date",
+        "SHOPPING_MALL": "shopping_mall",
+    }
+
+    out = out.rename(columns={k: v for k, v in rename_map.items() if k in out.columns})
+
+    if "gender" in out.columns:
+        out["gender"] = out["gender"].astype(str).str.strip().str.title()
+
+    if "category" in out.columns:
+        out["category"] = out["category"].astype(str).str.strip()
+
+    if "payment_method" in out.columns:
+        out["payment_method"] = out["payment_method"].astype(str).str.strip().str.title()
+
+    if "shopping_mall" in out.columns:
+        out["shopping_mall"] = out["shopping_mall"].astype(str).str.strip()
+
+    for col in ("age", "quantity"):
+        if col in out.columns:
+            out[col] = pd.to_numeric(out[col], errors="coerce")
+
+    if "price" in out.columns:
+        out["price"] = pd.to_numeric(out["price"], errors="coerce")
+
+    if "invoice_date" in out.columns:
+        parsed = parse_ecommerce_invoice_date(out["invoice_date"])
+        out["invoice_date"] = parsed
+
+        if "invoice_year" not in out.columns:
+            out["invoice_year"] = parsed.dt.year
+        if "invoice_month" not in out.columns:
+            out["invoice_month"] = parsed.dt.month
+        if "invoice_day" not in out.columns:
+            out["invoice_day"] = parsed.dt.day
+        if "day_of_week" not in out.columns:
+            out["day_of_week"] = parsed.dt.dayofweek
+        if "is_weekend" not in out.columns:
+            out["is_weekend"] = parsed.dt.dayofweek.isin([5, 6]).astype(int)
+
+    if "unit_price" not in out.columns and {"price", "quantity"}.issubset(out.columns):
+        denom = out["quantity"].replace(0, np.nan)
+        out["unit_price"] = out["price"] / denom
+
+    if "age_group" not in out.columns and "age" in out.columns:
+        out["age_group"] = pd.cut(
+            out["age"],
+            bins=[0, 25, 35, 45, 55, np.inf],
+            labels=["18_25", "26_35", "36_45", "46_55", "56_plus"],
+            include_lowest=True,
+        ).astype("object")
+
+    if "quantity_band" not in out.columns and "quantity" in out.columns:
+        out["quantity_band"] = pd.cut(
+            out["quantity"],
+            bins=[0, 1, 3, np.inf],
+            labels=["single", "small", "bulk"],
+            include_lowest=True,
+        ).astype("object")
+
+    return out
+
+
+def prepare_input_dataframe(df: pd.DataFrame, id_column: str) -> pd.DataFrame:
+    out = normalize_empty_strings(df)
+
+    if id_column == "transaction_id":
+        out = add_bank_derived_features(out)
+        out = ensure_transaction_id(out, id_column)
+        return out
+
+    if id_column == "invoice_no":
+        out = add_ecommerce_derived_features(out)
+        return out
 
     return out
 

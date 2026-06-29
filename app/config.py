@@ -20,6 +20,7 @@ class PipelineConfig:
     table_name: str
     id_column: str
     rules: Dict[str, ColumnRule]
+    source_query: Optional[str] = None
 
     contamination: float = 0.08
     n_estimators: int = 200

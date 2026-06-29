@@ -3,15 +3,14 @@ from pathlib import Path
 
 from app.app_settings import load_config_from_yaml
 from app.data_access.csv_source import CSVDataSource
+from app.data_access.postgresql_source import PostgresDataSource
 from app.services.pipeline_service import DataCleaningPipelineService
 from app.services.report_service import ReportService
 from app.services.fix_service import FixService
 from app.data_seeding.dirty_data_seeder import DirtyDataSeeder
 from app.utils import (
-    normalize_empty_strings,
     ensure_columns_exist,
-    ensure_transaction_id,
-    add_bank_derived_features,
+    prepare_input_dataframe,
 )
 
 
@@ -20,9 +19,20 @@ def parse_args():
         description="ML Data Cleaning Pipeline CLI"
     )
 
-    parser.add_argument("--input", required=True, help="Input CSV file path")
+    parser.add_argument("--input", default=None, help="Input CSV file path")
     parser.add_argument("--output", default="outputs", help="Output directory")
     parser.add_argument("--config", default=None, help="YAML config path")
+    parser.add_argument(
+        "--source",
+        choices=["csv", "postgres"],
+        default="csv",
+        help="Input source type",
+    )
+    parser.add_argument(
+        "--connection-uri",
+        default=None,
+        help="PostgreSQL connection URI when --source postgres is used",
+    )
 
     parser.add_argument("--report", action="store_true", help="Generate issue report")
     parser.add_argument("--apply-fixes", action="store_true", help="Apply suggested fixes")
@@ -47,15 +57,26 @@ def main():
 
     config = load_config_from_yaml(args.config)
 
-    source = CSVDataSource(
-        input_path=args.input,
-        output_dir=str(output_dir),
-    )
+    if args.source == "postgres":
+        if not args.connection_uri:
+            raise ValueError("--connection-uri is required when --source postgres is used")
+
+        source = PostgresDataSource(
+            connection_uri=args.connection_uri,
+            table_name=config.table_name,
+            query=config.source_query,
+        )
+    else:
+        if not args.input:
+            raise ValueError("--input is required when --source csv is used")
+
+        source = CSVDataSource(
+            input_path=args.input,
+            output_dir=str(output_dir),
+        )
 
     df = source.read()
-    df = normalize_empty_strings(df)
-    df = add_bank_derived_features(df)
-    df = ensure_transaction_id(df, config.id_column)
+    df = prepare_input_dataframe(df, config.id_column)
 
     if args.seed_dirty:
         seeder = DirtyDataSeeder(random_state=config.random_state)
@@ -80,7 +101,7 @@ def main():
     profile_df = report_service.build_dataset_profile(df, issues_df)
 
     source.write(issues_df, "detected_issues")
-    source.write(recommendations_df, "recommendations")
+    source.write(recommendations_df, "fix_recommendations")
     source.write(summary_df, "final_report")
     source.write(profile_df, "dataset_profile")
 
@@ -91,7 +112,7 @@ def main():
             issues_df=issues_df,
             mode=args.mode,
         )
-        source.write(fixed_df, "fixed_data")
+        source.write(fixed_df, "fixed_transactions")
 
     if args.report:
         print("=== REPORT ===")

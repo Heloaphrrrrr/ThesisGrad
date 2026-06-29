@@ -1,0 +1,196 @@
+table_name: transactions
+id_column: invoice_no
+source_query: |
+  SELECT
+      t.invoice_no,
+      t.customer_id,
+      c.gender,
+      c.age,
+      p.category,
+      t.quantity,
+      t.price,
+      t.payment_method,
+      t.invoice_date,
+      m.shopping_mall,
+      t.unit_price,
+      c.age_group,
+      t.invoice_year,
+      t.invoice_month,
+      t.invoice_day,
+      t.day_of_week,
+      t.is_weekend,
+      t.quantity_band,
+      t.price_deviation_from_category
+  FROM transactions AS t
+  JOIN customers AS c
+    ON c.customer_id = t.customer_id
+  JOIN products AS p
+    ON p.product_id = t.product_id
+  JOIN shopping_malls AS m
+    ON m.mall_id = t.mall_id
+
+model:
+  contamination: 0.08
+  n_estimators: 200
+  max_samples: 256
+  random_state: 42
+  knn_neighbors: 5
+  feature_z_threshold: 2.5
+  conservative_confidence_threshold: 0.85
+
+columns:
+  invoice_no:
+    dtype: id
+    required: true
+    use_for_detection: false
+    use_for_recommendation: false
+
+  customer_id:
+    dtype: categorical
+    required: true
+    use_for_detection: false
+    use_for_recommendation: false
+
+  gender:
+    dtype: categorical
+    required: true
+    allowed_values:
+      - Female
+      - Male
+    severity_if_missing: medium
+    severity_if_invalid: medium
+
+  age:
+    dtype: numeric
+    required: true
+    min_value: 0
+    max_value: 120
+    severity_if_missing: high
+    severity_if_invalid: high
+
+  category:
+    dtype: categorical
+    required: true
+    allowed_values:
+      - Books
+      - Clothing
+      - Cosmetics
+      - Food & Beverage
+      - Shoes
+      - Souvenir
+      - Technology
+      - Toys
+    severity_if_missing: medium
+    severity_if_invalid: medium
+
+  quantity:
+    dtype: numeric
+    required: true
+    min_value: 1
+    severity_if_missing: high
+    severity_if_invalid: high
+
+  price:
+    dtype: numeric
+    required: true
+    min_value: 0
+    severity_if_missing: high
+    severity_if_invalid: high
+
+  payment_method:
+    dtype: categorical
+    required: true
+    allowed_values:
+      - Cash
+      - Credit Card
+      - Debit Card
+    severity_if_missing: medium
+    severity_if_invalid: medium
+
+  invoice_date:
+    dtype: date
+    required: true
+    use_for_detection: false
+    use_for_recommendation: false
+    severity_if_missing: high
+    severity_if_invalid: high
+
+  shopping_mall:
+    dtype: categorical
+    required: true
+    allowed_values:
+      - Cevahir AVM
+      - Emaar Square Mall
+      - Forum Istanbul
+      - Istinye Park
+      - Kanyon
+      - Mall of Istanbul
+      - Metrocity
+      - Metropol AVM
+      - Viaport Outlet
+      - Zorlu Center
+    severity_if_missing: medium
+    severity_if_invalid: medium
+
+  unit_price:
+    dtype: numeric
+    required: false
+    min_value: 0
+    use_for_detection: true
+    use_for_recommendation: true
+
+  age_group:
+    dtype: categorical
+    required: false
+    use_for_detection: true
+    use_for_recommendation: true
+
+  invoice_year:
+    dtype: numeric
+    required: false
+    use_for_detection: true
+    use_for_recommendation: false
+
+  invoice_month:
+    dtype: numeric
+    required: false
+    min_value: 1
+    max_value: 12
+    use_for_detection: true
+    use_for_recommendation: false
+
+  invoice_day:
+    dtype: numeric
+    required: false
+    min_value: 1
+    max_value: 31
+    use_for_detection: true
+    use_for_recommendation: false
+
+  day_of_week:
+    dtype: numeric
+    required: false
+    min_value: 0
+    max_value: 6
+    use_for_detection: true
+    use_for_recommendation: false
+
+  is_weekend:
+    dtype: numeric
+    required: false
+    min_value: 0
+    max_value: 1
+    use_for_detection: true
+    use_for_recommendation: false
+
+  quantity_band:
+    dtype: categorical
+    required: false
+    use_for_detection: true
+    use_for_recommendation: true
+
+  price_deviation_from_category:
+    dtype: numeric
+    required: false
+    use_for_detection: true
+    use_for_recommendation: true

@@ -20,10 +20,8 @@ class MissingDetector:
 
             series = df[col]
             missing_mask = series.isna()
-
-            if series.dtype == "object":
-                empty_mask = series.fillna("").astype(str).str.strip() == ""
-                missing_mask = missing_mask | empty_mask
+            empty_mask = series.astype("string").str.strip().eq("").fillna(False)
+            missing_mask = missing_mask | empty_mask
 
             for idx in df.index[missing_mask]:
                 issue = IssueRecord(

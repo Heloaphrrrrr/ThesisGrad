@@ -1,33 +1,27 @@
 import pandas as pd
-from sklearn.neighbors import NearestNeighbors
 
 from app.config import PipelineConfig
-from app.preprocessing.feature_builder import FeatureBuilder
 from app.utils import clamp_confidence
 from .base_recommender import BaseRecommender
+from .mixed_type_neighbors import MixedTypeNearestNeighbors
 
 
 class MissingRecommender(BaseRecommender):
     def __init__(self, config: PipelineConfig):
         self.config = config
-        self.feature_builder = FeatureBuilder(config)
-        self.nn = NearestNeighbors(n_neighbors=config.knn_neighbors, metric="euclidean")
+        self.nn = MixedTypeNearestNeighbors(config)
         self.reference_df: pd.DataFrame | None = None
 
     def fit(self, reference_df: pd.DataFrame):
         self.reference_df = reference_df.copy()
-        self.feature_builder.fit(reference_df)
-        X_ref = self.feature_builder.transform(reference_df)
-        self.nn.fit(X_ref)
+        self.nn.fit(reference_df)
         return self
 
     def recommend(self, row_df: pd.DataFrame, column_name: str) -> tuple:
         if self.reference_df is None:
             raise ValueError("MissingRecommender must be fitted first.")
 
-        X_row = self.feature_builder.transform(row_df)
-        _, indices = self.nn.kneighbors(X_row)
-        neighbors = self.reference_df.iloc[indices[0]]
+        neighbors = self.nn.kneighbors(row_df, exclude_columns=[column_name])
 
         rule = self.config.rules[column_name]
 

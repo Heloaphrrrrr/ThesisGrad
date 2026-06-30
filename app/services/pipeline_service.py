@@ -146,6 +146,10 @@ class DataCleaningPipelineService:
                 suggestion, rec_confidence = self.anomaly_recommender.recommend(row_df, col)
 
                 current_value = issue["current_value"]
+                if suggestion is None:
+                    all_issues.at[idx, "suggested_value"] = None
+                    all_issues.at[idx, "can_auto_fix"] = False
+                    continue
 
                 severity_score = self._calculate_anomaly_severity_score(
                     current_value=current_value,

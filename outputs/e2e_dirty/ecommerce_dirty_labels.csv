@@ -1,0 +1,15 @@
+row_id,column_name,issue_type,original_value,dirty_value
+I138884,payment_method,missing,Credit Card,
+I317333,category,missing,Shoes,   
+I127801,age,missing,20,
+I173702,payment_method,invalid,Credit Card,Paypal
+I337046,category,invalid,Books,Tech
+I227836,quantity,invalid,5,-5
+I121056,age,invalid,49.0,150
+I293112,invoice_date,invalid,2021-01-13 00:00:00,not-a-date
+I293455,unit_price,invalid,300.08,999999
+I326945,age_group,invalid,56_plus,56_plus
+I306368,invoice_month,invalid,12,1
+I139207,price,anomaly,15.15,1515.0
+I640508,unit_price,anomaly,35.84,3584.0000000000005
+I179802,price_deviation_from_category,anomaly,0.0,999999

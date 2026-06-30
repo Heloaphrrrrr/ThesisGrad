@@ -6,7 +6,31 @@ import pandas as pd
 
 
 def parse_ecommerce_invoice_date(series: pd.Series) -> pd.Series:
-    return pd.to_datetime(series, errors="coerce", dayfirst=True)
+    text_series = series.astype("string").str.strip()
+    iso_mask = text_series.str.match(r"^\d{4}-\d{1,2}-\d{1,2}").fillna(False)
+
+    parsed = pd.Series(pd.NaT, index=series.index, dtype="datetime64[ns]")
+    parsed.loc[iso_mask] = pd.to_datetime(
+        series.loc[iso_mask],
+        errors="coerce",
+        dayfirst=False,
+    )
+    parsed.loc[~iso_mask] = pd.to_datetime(
+        series.loc[~iso_mask],
+        errors="coerce",
+        dayfirst=True,
+    )
+
+    failed_mask = parsed.isna() & series.notna()
+
+    if failed_mask.any():
+        parsed.loc[failed_mask] = pd.to_datetime(
+            series.loc[failed_mask],
+            errors="coerce",
+            dayfirst=False,
+        )
+
+    return parsed
 
 
 def normalize_empty_strings(df: pd.DataFrame) -> pd.DataFrame:

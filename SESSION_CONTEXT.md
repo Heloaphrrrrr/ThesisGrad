@@ -421,3 +421,106 @@ Bắt đầu step 1 theo end_to_end_manual_run.md
 ```
 
 là có thể tiếp tục ngay.
+## Cap nhat ngay 2026-06-30
+
+### Viec da xac nhan hom nay
+
+- Da ra soat lai workspace sau khi khong `resume` duoc goal Codex cu.
+- Da xac nhan tien trinh khong mat, vi artefact chinh van con trong repo:
+  - `SESSION_CONTEXT.md`
+  - `docs/end_to_end_manual_run.md`
+  - `docs/run_import_postgres.py`
+  - `docs/run_pipeline_full.py`
+  - `docs/explainDTB.md`
+- Da xac nhan sample dirty input con ton tai:
+  - `outputs/e2e_dirty/ecommerce_dirty_sample.csv`
+  - `outputs/e2e_dirty/ecommerce_dirty_labels.csv`
+
+### End-to-end da chay hom nay
+
+Da chay thanh cong pipeline end-to-end tren sample CSV bang lenh:
+
+```powershell
+python -m app.cli --source csv --input outputs/e2e_dirty/ecommerce_dirty_sample.csv --config configs/ecommerce_config.yaml --output outputs/e2e_dirty/run_20260630_9h15 --apply-fixes --report
+```
+
+### Output sinh ra
+
+Thu muc output:
+
+```text
+outputs/e2e_dirty/run_20260630_9h15
+```
+
+Các file da sinh ra:
+
+- `dataset_profile.csv`
+- `detected_issues.csv`
+- `final_report.csv`
+- `fixed_transactions.csv`
+- `fix_recommendations.csv`
+
+### Ket qua chinh cua lan chay sample
+
+- `total_issues = 417`
+- `issue_type_anomaly = 395`
+- `issue_type_invalid = 15`
+- `issue_type_missing = 7`
+- `fixable_rate = 0.9976`
+
+Luu y:
+
+- Sample dirty khong chi chua 14 loi co trong labels, ma con phat sinh them nhieu anomaly thong ke tren toan bo sample.
+- Vi vay tong so issue pipeline phat hien lon hon so dong trong file labels la binh thuong.
+
+### Phat hien quan trong ve file labels
+
+Da kiem tra va xac nhan:
+
+- Dong `I127711` co trong `outputs/e2e_dirty/ecommerce_dirty_sample.csv`
+- Nhung khong co trong `outputs/e2e_dirty/ecommerce_dirty_labels.csv`
+
+Dong `I127711` hien la dirty row duoc them sau buoc sinh labels hoac duoc chen tay, nen labels hien tai khong con la ground truth hoan chinh cho toan bo sample.
+
+Pipeline da phat hien nhieu loi cho `I127711`, gom:
+
+- `quantity`: missing
+- `price`: missing
+- `invoice_date`: missing
+- `gender`: invalid
+- `category`: invalid
+- `payment_method`: invalid
+- `shopping_mall`: invalid
+
+### Y nghia hien tai cua file labels
+
+`outputs/e2e_dirty/ecommerce_dirty_labels.csv` hien chi nen duoc xem la:
+
+- ground truth cho bo loi dirty goc duoc seed tu dong
+- khong phai ground truth day du cho toan bo `ecommerce_dirty_sample.csv`
+
+### Viec nen lam ngay mai
+
+Uu tien test tiep:
+
+1. Quyet dinh cach dung labels:
+   - hoac cap nhat labels de them `I127711`
+   - hoac giu nguyen labels cu va xem `I127711` la test thu cong ngoai bo ground truth
+2. Neu muon danh gia detector/recommender:
+   - so sanh `detected_issues.csv` voi `ecommerce_dirty_labels.csv`
+   - tinh precision / recall tren bo 14 loi goc
+3. Sau do co the test tiep flow PostgreSQL full end-to-end neu can
+
+### Cau nhac de mo lai nhanh ngay mai
+
+Chi can bat dau bang mot trong cac cau sau:
+
+```text
+Doc SESSION_CONTEXT.md va tiep tuc test bo sample dirty
+```
+
+hoac:
+
+```text
+Kiem tra labels cu va them ground truth cho I127711
+```

@@ -45,6 +45,8 @@ def load_config_from_yaml(path: str | None) -> PipelineConfig:
         n_estimators=model_cfg.get("n_estimators", 200),
         max_samples=model_cfg.get("max_samples", 256),
         random_state=model_cfg.get("random_state", 42),
+        anomaly_segment_column=model_cfg.get("anomaly_segment_column"),
+        min_anomaly_segment_size=model_cfg.get("min_anomaly_segment_size", 500),
         knn_neighbors=model_cfg.get("knn_neighbors", 5),
         feature_z_threshold=model_cfg.get("feature_z_threshold", 2.5),
         conservative_confidence_threshold=model_cfg.get(

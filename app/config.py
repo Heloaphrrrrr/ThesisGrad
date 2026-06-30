@@ -26,6 +26,8 @@ class PipelineConfig:
     n_estimators: int = 200
     max_samples: int = 256
     random_state: int = 42
+    anomaly_segment_column: Optional[str] = None
+    min_anomaly_segment_size: int = 500
 
     knn_neighbors: int = 5
     feature_z_threshold: float = 2.5

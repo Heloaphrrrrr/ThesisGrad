@@ -59,7 +59,10 @@ class InvalidDetector:
     def _detect_numeric_invalid(self, df, col, series, rule):
         records = []
         numeric_series = safe_to_numeric(series)
-        non_missing_mask = ~series.isna()
+        non_missing_mask = (
+            ~series.isna()
+            & ~series.astype("string").str.strip().eq("").fillna(False)
+        )
         invalid_type_mask = non_missing_mask & numeric_series.isna()
 
         for idx in df.index[invalid_type_mask]:
@@ -110,7 +113,13 @@ class InvalidDetector:
         if not rule.allowed_values:
             return records
 
-        mask = ~series.isna() & ~series.isin(rule.allowed_values)
+        normalized_series = series.astype("string").str.strip().str.casefold()
+        normalized_allowed = {
+            str(value).strip().casefold()
+            for value in rule.allowed_values
+        }
+        non_missing_mask = ~series.isna() & ~normalized_series.eq("").fillna(False)
+        mask = non_missing_mask & ~normalized_series.isin(normalized_allowed)
 
         for idx in df.index[mask]:
             records.append(

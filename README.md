@@ -213,8 +213,3 @@ Kết luận từ benchmark:
 - `scripts/import_ecommerce_data.py`: chuẩn hóa và tách dữ liệu e-commerce.
 - `sql/postgresql_schema.sql`: schema PostgreSQL chính.
 - `configs/ecommerce_config.yaml`: config cho pipeline e-commerce.
-
-## 11. Tóm tắt ngắn để báo cáo
-
-Đồ án này xây dựng một hệ thống làm sạch dữ liệu lai giữa luật và AI cho dữ liệu giao dịch mua sắm.  
-Hệ thống không chỉ phát hiện lỗi thiếu và sai rõ ràng, mà còn phát hiện các bản ghi bất thường theo ngữ cảnh, sinh gợi ý sửa, và lưu toàn bộ kết quả vào PostgreSQL để phục vụ báo cáo, kiểm tra và mở rộng sau này.

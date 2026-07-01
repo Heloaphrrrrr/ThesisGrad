@@ -524,3 +524,36 @@ hoac:
 ```text
 Kiem tra labels cu va them ground truth cho I127711
 ```
+
+## Cap nhat ngay 2026-07-01
+
+### Muc tieu trong ngay
+
+- Tiep tuc toi uu he thong theo huong thuc te, tap trung vao toc do chay full pipeline.
+- Giui nguyen logic chinh, chi sua nhung cho gay ton thoi gian.
+
+### Viec da lam
+
+- Them `--profile-runtime` vao `app/cli.py` de do thoi gian tung stage.
+- Toi uu `app/services/pipeline_service.py` bang cach tao `invoice_no` lookup mot lan, tranh filter DataFrame lap lai nhieu lan.
+- Gioi han tap tham chieu cho KNN trong:
+  - `app/recommenders/mixed_type_neighbors.py`
+  - `app/detectors/feature_contribution.py`
+- Them `max_reference_rows` vao config de khong fit KNN/nearest-neighbor tren toan bo 99k dong neu khong can.
+- Bo sung sinh `price_deviation_from_category` cho luong CSV raw trong `app/utils.py` de CSV workflow co the chay tu dau vao `xlsx` duoc convert sang `csv`.
+
+### Ket qua kiem tra
+
+- CSV sample 1.000 dong chay thanh cong.
+- Full CSV 99.457 dong chay thanh cong trong khoang 492 giay.
+- Runtime profile cho thay bottleneck chinh nam o `run_pipeline`, khong con o I/O.
+
+### Output da xac nhan
+
+- `outputs/csv_smoke_sample_optimized`
+- `outputs/csv_full_optimized`
+
+### Ket luan trong ngay
+
+- He thong da on hon ve toc do va da co benchmark ro rang.
+- Buoc tiep theo neu can toi uu nua la di sau vao anomaly/recommendation, khong phai doc/ghi file.

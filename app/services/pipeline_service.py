@@ -30,6 +30,7 @@ class DataCleaningPipelineService:
 
     def run(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
+        row_lookup = self._build_row_lookup(df)
 
         missing_df = self.missing_detector.detect(df)
         invalid_df = self.invalid_detector.detect(df)
@@ -61,11 +62,12 @@ class DataCleaningPipelineService:
         ]
 
         anomaly_records = []
+        score_lookup = score_df.set_index(self.config.id_column, drop=False)
 
         for row_id in anomaly_rows:
-            row_df = df[df[self.config.id_column] == row_id].copy()
+            row_df = row_lookup.get(row_id)
 
-            if row_df.empty:
+            if row_df is None:
                 continue
 
             suspicious_cols = self.feature_analyzer.find_suspicious_columns(
@@ -73,7 +75,7 @@ class DataCleaningPipelineService:
                 candidate_cols,
             )
 
-            score_row = score_df[score_df[self.config.id_column] == row_id].iloc[0]
+            score_row = score_lookup.loc[row_id]
             decision_score = float(score_row["decision_score"])
             raw_score = float(score_row["raw_score"])
 
@@ -120,9 +122,9 @@ class DataCleaningPipelineService:
             row_id = issue["row_id"]
             col = issue["column_name"]
 
-            row_df = df[df[self.config.id_column] == row_id].copy()
+            row_df = row_lookup.get(row_id)
 
-            if row_df.empty:
+            if row_df is None:
                 continue
 
             if issue_type == "missing":
@@ -165,6 +167,12 @@ class DataCleaningPipelineService:
                 all_issues.at[idx, "severity"] = severity_from_score(severity_score)
 
         return all_issues[self.config.issue_output_columns]
+
+    def _build_row_lookup(self, df: pd.DataFrame) -> dict:
+        return {
+            row_id: group.copy()
+            for row_id, group in df.groupby(self.config.id_column, sort=False)
+        }
 
     @staticmethod
     def _calculate_anomaly_severity_score(current_value, suggested_value) -> float:

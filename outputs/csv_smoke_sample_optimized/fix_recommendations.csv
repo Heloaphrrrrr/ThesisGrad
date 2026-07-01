@@ -1,0 +1,104 @@
+issue_id,row_id,column_name,issue_type,current_value,suggested_value,confidence,severity,reason,can_auto_fix
+a0f4e322-0a58-4f05-9782-e153b2c3cafe,I196704,shopping_mall,invalid,MALL,Cevahir AVM,0.5,medium,"Value is not in allowed values: ['Cevahir AVM', 'Emaar Square Mall', 'Forum Istanbul', 'Istinye Park', 'Kanyon', 'Mall of Istanbul', 'Metrocity', 'Metropol AVM', 'Viaport Outlet', 'Zorlu Center'].",True
+7ae49346-df8e-4a77-9488-26c4ef3008c6,I317333,payment_method,anomaly,Debit Card,Cash,0.0628,high,Column 'payment_method' deviates from similar normal records.,True
+99e6e4af-e80a-4f91-bfa5-2b714d5cc8f6,I317333,shopping_mall,anomaly,Forum Istanbul,Mall of Istanbul,0.0628,high,Column 'shopping_mall' deviates from similar normal records.,True
+9f090cf5-f88e-4082-8263-afb12d902718,I688768,payment_method,anomaly,Credit Card,Cash,0.2146,high,Column 'payment_method' deviates from similar normal records.,True
+9be09d64-fd81-478b-b5b8-0e5b8b6969d7,I688768,shopping_mall,anomaly,Viaport Outlet,Emaar Square Mall,0.2,high,Column 'shopping_mall' deviates from similar normal records.,True
+f500aff4-e678-4e52-9e6d-dd9dae54674c,I252275,shopping_mall,anomaly,Kanyon,Cevahir AVM,0.0745,high,Column 'shopping_mall' deviates from similar normal records.,True
+187cedae-2950-4cb9-8434-2301f92795cb,I331891,shopping_mall,anomaly,Emaar Square Mall,Emaar Square Mall,0.0072,high,Column 'shopping_mall' deviates from similar normal records.,True
+ec42325d-c3dc-4e46-89c3-d6500bfff1cb,I269690,category,anomaly,Cosmetics,Cosmetics,0.0716,high,Column 'category' deviates from similar normal records.,True
+22cdf813-abdf-4dbb-bf78-81976b367ffd,I260525,gender,anomaly,Male,Female,0.0527,high,Column 'gender' deviates from similar normal records.,True
+a3c4d0d4-e7a8-4702-b6f2-7d2cea3f1c9a,I260525,category,anomaly,Toys,Food & Beverage,0.0527,high,Column 'category' deviates from similar normal records.,True
+066ed3a6-49b6-4b2f-85ff-2d8be6fe142d,I260525,shopping_mall,anomaly,Emaar Square Mall,Zorlu Center,0.0527,high,Column 'shopping_mall' deviates from similar normal records.,True
+ca9fbf45-9d86-4d7a-9945-a7820ac3fe74,I278401,category,anomaly,Toys,Cosmetics,0.0136,high,Column 'category' deviates from similar normal records.,True
+dc22e1a8-7340-45c6-87ea-927e7d7281fa,I278401,payment_method,anomaly,Debit Card,Credit Card,0.0136,high,Column 'payment_method' deviates from similar normal records.,True
+48208738-ad1d-49af-bf87-1f84d4d50366,I402966,shopping_mall,anomaly,Viaport Outlet,Forum Istanbul,0.0223,high,Column 'shopping_mall' deviates from similar normal records.,True
+1d428235-ed52-406d-8156-c45303e6faed,I530401,shopping_mall,anomaly,Zorlu Center,Kanyon,0.0217,high,Column 'shopping_mall' deviates from similar normal records.,True
+23b13a7b-7ffa-4206-ba4e-1a778d27d177,I229355,gender,anomaly,Male,Female,0.0396,high,Column 'gender' deviates from similar normal records.,True
+9d447446-390e-4eb1-b2b9-69a791c07c92,I246151,category,anomaly,Books,Cosmetics,0.0081,high,Column 'category' deviates from similar normal records.,True
+7c1ac9bd-92ea-4a5f-a187-e4aef5e1141e,I246151,shopping_mall,anomaly,Metropol AVM,Kanyon,0.0081,high,Column 'shopping_mall' deviates from similar normal records.,True
+74487b70-d941-4d25-bb24-ea50af5a53da,I191148,shopping_mall,anomaly,Forum Istanbul,Kanyon,0.0398,high,Column 'shopping_mall' deviates from similar normal records.,True
+446df4bd-48f6-4ffd-afaf-6ee2d9f3f317,I305432,shopping_mall,anomaly,Mall of Istanbul,Cevahir AVM,0.0059,high,Column 'shopping_mall' deviates from similar normal records.,True
+ed3d0ae7-cd93-45a7-b3a8-36e6f435fa7a,I243930,payment_method,anomaly,Debit Card,Cash,0.1465,high,Column 'payment_method' deviates from similar normal records.,True
+32dcbfa9-038f-4dde-93e4-0e8bb5493a24,I243930,shopping_mall,anomaly,Istinye Park,Cevahir AVM,0.1465,high,Column 'shopping_mall' deviates from similar normal records.,True
+719a5d0d-b722-49a6-b08a-ba71f26c4aec,I243930,age_group,anomaly,46_55,56_plus,0.1465,high,Column 'age_group' deviates from similar normal records.,True
+707391c0-e3e2-43cb-9c3b-2e7a5fbe49d5,I615452,shopping_mall,anomaly,Metrocity,Metropol AVM,0.0096,high,Column 'shopping_mall' deviates from similar normal records.,True
+dc7f9fb9-3281-4d72-96f4-59498e07d524,I300847,shopping_mall,anomaly,Istinye Park,Kanyon,0.0058,high,Column 'shopping_mall' deviates from similar normal records.,True
+4c1e1f29-55b6-4ae4-98eb-16938e6ec7bf,I194017,payment_method,anomaly,Cash,Cash,0.044,high,Column 'payment_method' deviates from similar normal records.,True
+f3e7321e-5315-403b-ac3f-d650013871eb,I337094,shopping_mall,anomaly,Zorlu Center,Istinye Park,0.1221,high,Column 'shopping_mall' deviates from similar normal records.,True
+ebc730ea-fd92-4903-80ba-f9101979a99c,I162719,gender,anomaly,Male,Female,0.0339,high,Column 'gender' deviates from similar normal records.,True
+7facc0b9-42b9-4517-a4e1-739ca68002bc,I162719,payment_method,anomaly,Credit Card,Credit Card,0.0339,high,Column 'payment_method' deviates from similar normal records.,True
+41c3c768-39bc-4a47-91d5-72c1d2e054ee,I162719,shopping_mall,anomaly,Emaar Square Mall,Emaar Square Mall,0.0339,high,Column 'shopping_mall' deviates from similar normal records.,True
+7028d771-c948-44e1-ae19-d2fdd856c28c,I252528,gender,anomaly,Male,Male,0.1334,high,Column 'gender' deviates from similar normal records.,True
+d96e1303-8801-4480-8284-28f3803ca6ac,I278519,gender,anomaly,Male,Male,0.1167,high,Column 'gender' deviates from similar normal records.,True
+73edb79f-d006-49ee-87d3-7e9b575229f4,I278519,payment_method,anomaly,Debit Card,Credit Card,0.1167,high,Column 'payment_method' deviates from similar normal records.,True
+d459443d-99be-419c-b1f5-aa7c0a1d83e4,I946433,payment_method,anomaly,Debit Card,Credit Card,0.0676,high,Column 'payment_method' deviates from similar normal records.,True
+ba8b90f1-344c-44d2-bc43-79ffc5181709,I946433,age_group,anomaly,26_35,26_35,0.0676,low,Column 'age_group' deviates from similar normal records.,True
+0bef04b4-8a5e-4f30-912c-bc5a17144d77,I284431,shopping_mall,anomaly,Metropol AVM,Kanyon,0.0585,high,Column 'shopping_mall' deviates from similar normal records.,True
+ccbff57f-064e-4a04-976f-c57986946bb7,I236520,payment_method,anomaly,Credit Card,Cash,0.0579,high,Column 'payment_method' deviates from similar normal records.,True
+e4013296-5bf7-4553-9ab1-e6165985e121,I236520,shopping_mall,anomaly,Viaport Outlet,Cevahir AVM,0.0579,high,Column 'shopping_mall' deviates from similar normal records.,True
+a243b9e8-37bf-496c-93ef-c230bd49cc97,I295482,payment_method,anomaly,Credit Card,Cash,0.0409,high,Column 'payment_method' deviates from similar normal records.,True
+746cf996-083c-4a9f-bf30-a3aacddc2402,I295482,shopping_mall,anomaly,Zorlu Center,Mall of Istanbul,0.0409,high,Column 'shopping_mall' deviates from similar normal records.,True
+cb30b003-3e0e-49ef-8b55-03592d659772,I873382,payment_method,anomaly,Credit Card,Cash,0.009,high,Column 'payment_method' deviates from similar normal records.,True
+6ba9a947-301e-4606-b8de-a2e027913647,I873382,shopping_mall,anomaly,Metrocity,Istinye Park,0.009,high,Column 'shopping_mall' deviates from similar normal records.,True
+325c8fa9-6803-4437-8b70-250965faaedf,I283774,category,anomaly,Toys,Toys,0.1846,high,Column 'category' deviates from similar normal records.,True
+1486aa97-39e2-41e0-b7ea-debe81abe88a,I283774,age_group,anomaly,36_45,36_45,0.1846,low,Column 'age_group' deviates from similar normal records.,True
+4b3ca28e-224a-4cd1-b307-a8f55fce534c,I212305,category,anomaly,Books,Toys,0.0671,high,Column 'category' deviates from similar normal records.,True
+b236d450-840b-4035-920b-11afea9aaf85,I212305,shopping_mall,anomaly,Emaar Square Mall,Emaar Square Mall,0.0671,high,Column 'shopping_mall' deviates from similar normal records.,True
+ebc61020-9330-43dc-abb2-27d7e31468ea,I213589,shopping_mall,anomaly,Viaport Outlet,Cevahir AVM,0.1173,high,Column 'shopping_mall' deviates from similar normal records.,True
+26459302-31a9-4f3e-bec2-963937c88d2a,I251779,category,anomaly,Toys,Cosmetics,0.008,high,Column 'category' deviates from similar normal records.,True
+80c52161-1a45-4948-a07a-ef042585b42f,I251779,payment_method,anomaly,Debit Card,Cash,0.008,high,Column 'payment_method' deviates from similar normal records.,True
+fad93aa6-c8ea-41d3-ba4f-fdedd999c67a,I334155,category,anomaly,Books,Food & Beverage,0.0004,high,Column 'category' deviates from similar normal records.,True
+528a1b6e-362d-4a29-abe1-54ca6b39bec9,I334155,shopping_mall,anomaly,Viaport Outlet,Metropol AVM,0.0004,high,Column 'shopping_mall' deviates from similar normal records.,True
+5a6b87f4-f8ff-421f-87c6-2faab36fcc56,I111055,shopping_mall,anomaly,Mall of Istanbul,Metrocity,0.0116,high,Column 'shopping_mall' deviates from similar normal records.,True
+7fdd423a-086e-41a0-a278-3d58a20a0b68,I251307,age_group,anomaly,56_plus,56_plus,0.0136,high,Column 'age_group' deviates from similar normal records.,True
+40c6487e-9c63-492e-a18b-5cf6225dc26e,I311849,payment_method,anomaly,Debit Card,Cash,0.1501,high,Column 'payment_method' deviates from similar normal records.,True
+8e373781-6392-46ba-80c9-42ac14eef25f,I325555,age_group,anomaly,18_25,18_25,0.1743,low,Column 'age_group' deviates from similar normal records.,True
+6ad03d27-f1a0-43fd-8bef-366f0c391347,I318625,shopping_mall,anomaly,Zorlu Center,Kanyon,0.2088,high,Column 'shopping_mall' deviates from similar normal records.,True
+928debc6-1c89-4682-b86e-3dc76d3c756b,I318625,age_group,anomaly,46_55,26_35,0.2088,high,Column 'age_group' deviates from similar normal records.,True
+7b186ca2-50c9-4563-8e0f-65cf9bf42020,I142245,payment_method,anomaly,Debit Card,Credit Card,0.0215,high,Column 'payment_method' deviates from similar normal records.,True
+2ba05262-de9d-4a1c-860c-461296efc961,I142245,shopping_mall,anomaly,Zorlu Center,Mall of Istanbul,0.0215,high,Column 'shopping_mall' deviates from similar normal records.,True
+d0c9dc43-bc4e-4eb1-b7b0-329fb4c13858,I302151,shopping_mall,anomaly,Kanyon,Kanyon,0.0059,high,Column 'shopping_mall' deviates from similar normal records.,True
+53005098-3db6-4fe0-87e4-f2ad18fd21e5,I169684,shopping_mall,anomaly,Zorlu Center,Kanyon,0.0409,high,Column 'shopping_mall' deviates from similar normal records.,True
+daacffd8-0597-42fe-881f-37de48f0f229,I119678,shopping_mall,anomaly,Emaar Square Mall,Cevahir AVM,0.0103,high,Column 'shopping_mall' deviates from similar normal records.,True
+365dd70a-0a33-42fb-ad2a-64d1b64ef91e,I338366,payment_method,anomaly,Debit Card,Credit Card,0.0572,high,Column 'payment_method' deviates from similar normal records.,True
+9c87cc1d-4a62-4fb7-8623-f05319bb1c73,I338366,shopping_mall,anomaly,Viaport Outlet,Emaar Square Mall,0.0572,high,Column 'shopping_mall' deviates from similar normal records.,True
+5ab10bd2-45bf-44d4-890f-4555652979e5,I254886,payment_method,anomaly,Debit Card,Cash,0.0774,high,Column 'payment_method' deviates from similar normal records.,True
+6468a6b3-b04e-4463-be80-e50c81f87413,I254886,shopping_mall,anomaly,Mall of Istanbul,Mall of Istanbul,0.0774,high,Column 'shopping_mall' deviates from similar normal records.,True
+5c738bb9-9f97-453c-941a-1f9537a381ab,I929854,category,anomaly,Shoes,Clothing,0.0544,high,Column 'category' deviates from similar normal records.,True
+5d7588d7-0e28-429a-9465-0cf58baed9b9,I929854,payment_method,anomaly,Debit Card,Credit Card,0.0544,high,Column 'payment_method' deviates from similar normal records.,True
+55f42027-8897-42ad-9280-4f9a21b48834,I929854,shopping_mall,anomaly,Metropol AVM,Metropol AVM,0.0544,high,Column 'shopping_mall' deviates from similar normal records.,True
+70a7f6d9-8251-47d1-af2f-7fa23831a91b,I863565,shopping_mall,anomaly,Viaport Outlet,Forum Istanbul,0.003,high,Column 'shopping_mall' deviates from similar normal records.,True
+09407d82-b270-4988-86bd-f74a555f7da2,I863565,age_group,anomaly,18_25,26_35,0.003,medium,Column 'age_group' deviates from similar normal records.,True
+0934e737-0ba4-4ac3-9184-0f0b14841bd4,I148039,payment_method,anomaly,Debit Card,Cash,0.0032,high,Column 'payment_method' deviates from similar normal records.,True
+595186ea-0899-43cd-ad65-cf113e4080b7,I528108,category,anomaly,Books,Clothing,0.0932,high,Column 'category' deviates from similar normal records.,True
+a95104b5-80c4-49ec-b5f7-a3f049eb8e0c,I328430,shopping_mall,anomaly,Viaport Outlet,Emaar Square Mall,0.0136,high,Column 'shopping_mall' deviates from similar normal records.,True
+074995d9-4cd8-4af1-958b-79d00f4401e2,I551504,category,anomaly,Shoes,Clothing,0.115,high,Column 'category' deviates from similar normal records.,True
+88ea203a-3ec1-4cec-a732-6b9d02930728,I551504,shopping_mall,anomaly,Zorlu Center,Kanyon,0.115,high,Column 'shopping_mall' deviates from similar normal records.,True
+0c6ef2ae-5466-4df7-b93d-baebf9cd2d8e,I301887,payment_method,anomaly,Credit Card,Cash,0.0995,high,Column 'payment_method' deviates from similar normal records.,True
+68285d5b-6c18-4668-a489-6f91ef3dcd55,I301887,shopping_mall,anomaly,Zorlu Center,Kanyon,0.0995,high,Column 'shopping_mall' deviates from similar normal records.,True
+52488f87-aaf8-47d6-949d-10c67824a52d,I283492,shopping_mall,anomaly,Emaar Square Mall,Metropol AVM,0.0047,high,Column 'shopping_mall' deviates from similar normal records.,True
+3b265c7c-4fd4-49e8-bd5e-fe84eba71c3b,I126253,shopping_mall,anomaly,Metrocity,Metrocity,0.04,high,Column 'shopping_mall' deviates from similar normal records.,True
+e6cfd3b0-6225-4923-99f2-626b56eac51e,I322886,shopping_mall,anomaly,Istinye Park,Mall of Istanbul,0.0437,high,Column 'shopping_mall' deviates from similar normal records.,True
+24e36e4c-735e-40ec-a7db-d1b8b28a159b,I472142,gender,anomaly,Male,Female,0.003,high,Column 'gender' deviates from similar normal records.,True
+bf1fd0e2-3fd9-46af-95c6-83ed141cf79e,I208028,payment_method,anomaly,Credit Card,Cash,0.1249,high,Column 'payment_method' deviates from similar normal records.,True
+e6d5e30d-97e1-4f66-9a2d-8bd64856fc1a,I148225,shopping_mall,anomaly,Mall of Istanbul,Kanyon,0.0075,high,Column 'shopping_mall' deviates from similar normal records.,True
+5167f113-6e6e-4939-aae0-72a3afbb3719,I307337,shopping_mall,anomaly,Metropol AVM,Mall of Istanbul,0.0728,high,Column 'shopping_mall' deviates from similar normal records.,True
+64ec3fc6-3f78-4c58-b6a0-216a66066d32,I713320,category,anomaly,Technology,Shoes,0.1859,high,Column 'category' deviates from similar normal records.,True
+7cb3b32b-e2a3-47bf-bbbd-cdb31ddd1655,I713320,shopping_mall,anomaly,Zorlu Center,Kanyon,0.1859,high,Column 'shopping_mall' deviates from similar normal records.,True
+38d78453-3e38-4187-93d2-541b0edf9eea,I713320,age_group,anomaly,26_35,26_35,0.1859,low,Column 'age_group' deviates from similar normal records.,True
+2b765de8-ec67-428b-8b32-f2a58112695f,I291281,shopping_mall,anomaly,Metropol AVM,Kanyon,0.0452,high,Column 'shopping_mall' deviates from similar normal records.,True
+88239293-462a-4666-922f-a172e16f18bc,I211823,payment_method,anomaly,Debit Card,Debit Card,0.0776,high,Column 'payment_method' deviates from similar normal records.,True
+c16f171f-80e6-44f2-8ffd-5d20a33e6356,I211823,shopping_mall,anomaly,Zorlu Center,Metrocity,0.0776,high,Column 'shopping_mall' deviates from similar normal records.,True
+3b7edb7a-b892-481f-acc0-a7d8842d5eda,I186437,payment_method,anomaly,Debit Card,Cash,0.0517,high,Column 'payment_method' deviates from similar normal records.,True
+623aeb9d-ca2d-406b-bf2a-afca37207c48,I186437,shopping_mall,anomaly,Kanyon,Kanyon,0.0517,high,Column 'shopping_mall' deviates from similar normal records.,True
+ffc0bfcd-a607-4b3a-85ff-7357f8f3c090,I328455,gender,anomaly,Male,Female,0.0644,high,Column 'gender' deviates from similar normal records.,True
+9f69d80d-2d36-40d3-89fc-8b759e89cd18,I328455,shopping_mall,anomaly,Mall of Istanbul,Mall of Istanbul,0.0644,high,Column 'shopping_mall' deviates from similar normal records.,True
+acd72acd-d087-48be-92e7-bef481423fe8,I300065,shopping_mall,anomaly,Viaport Outlet,Kanyon,0.1535,high,Column 'shopping_mall' deviates from similar normal records.,True
+6c0a9fbf-ad81-4c3a-9ad7-6fa9a3d4436c,I846448,category,anomaly,Cosmetics,Food & Beverage,0.0075,high,Column 'category' deviates from similar normal records.,True
+0bfe9337-f8d8-483f-a0ab-fae18b1f6345,I846448,payment_method,anomaly,Debit Card,Cash,0.0075,high,Column 'payment_method' deviates from similar normal records.,True
+cd75411b-8705-47ca-bf80-0fe322a05bab,I304483,shopping_mall,anomaly,Viaport Outlet,Viaport Outlet,0.0475,high,Column 'shopping_mall' deviates from similar normal records.,True
+5b3d657e-97b8-4293-a176-d2eacd9fd209,I539167,shopping_mall,anomaly,Zorlu Center,Istinye Park,0.0089,high,Column 'shopping_mall' deviates from similar normal records.,True
+95cc9038-a59c-4652-811a-4c3aae5120ce,I165932,gender,anomaly,Male,Female,0.0146,high,Column 'gender' deviates from similar normal records.,True
+c4c709ba-8335-426e-97c8-e3abd69e1fbd,I165932,shopping_mall,anomaly,Cevahir AVM,Cevahir AVM,0.0146,high,Column 'shopping_mall' deviates from similar normal records.,True
+25eec718-15c4-46fe-8bbf-47122d5a8913,I248527,shopping_mall,anomaly,Viaport Outlet,Kanyon,0.0403,high,Column 'shopping_mall' deviates from similar normal records.,True

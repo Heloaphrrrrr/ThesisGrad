@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from time import perf_counter
 
 from app.app_settings import load_config_from_yaml
 from app.data_access.csv_source import CSVDataSource
@@ -35,6 +36,11 @@ def parse_args():
     )
 
     parser.add_argument("--report", action="store_true", help="Generate issue report")
+    parser.add_argument(
+        "--profile-runtime",
+        action="store_true",
+        help="Print runtime timing for major pipeline stages",
+    )
     parser.add_argument("--apply-fixes", action="store_true", help="Apply suggested fixes")
     parser.add_argument(
         "--mode",
@@ -51,11 +57,18 @@ def parse_args():
 
 def main():
     args = parse_args()
+    runtime_marks = []
+
+    def mark(stage_name: str, started_at: float) -> None:
+        if args.profile_runtime:
+            runtime_marks.append((stage_name, perf_counter() - started_at))
 
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    stage_started = perf_counter()
     config = load_config_from_yaml(args.config)
+    mark("load_config", stage_started)
 
     if args.source == "postgres":
         if not args.connection_uri:
@@ -75,8 +88,13 @@ def main():
             output_dir=str(output_dir),
         )
 
+    stage_started = perf_counter()
     df = source.read()
+    mark("read_source", stage_started)
+
+    stage_started = perf_counter()
     df = prepare_input_dataframe(df, config.id_column)
+    mark("prepare_input", stage_started)
 
     if args.seed_dirty:
         seeder = DirtyDataSeeder(random_state=config.random_state)
@@ -90,29 +108,42 @@ def main():
         print(f"Labels: {output_dir / 'seeded_dirty_labels.csv'}")
         return
 
+    stage_started = perf_counter()
     ensure_columns_exist(df, list(config.rules.keys()))
+    mark("validate_columns", stage_started)
 
+    stage_started = perf_counter()
     pipeline = DataCleaningPipelineService(config)
     issues_df = pipeline.run(df)
+    mark("run_pipeline", stage_started)
 
+    stage_started = perf_counter()
     report_service = ReportService()
     summary_df = report_service.build_summary(issues_df)
     recommendations_df = report_service.build_recommendations(issues_df)
     profile_df = report_service.build_dataset_profile(df, issues_df)
+    mark("build_reports", stage_started)
 
+    stage_started = perf_counter()
     source.write(issues_df, "detected_issues")
     source.write(recommendations_df, "fix_recommendations")
     source.write(summary_df, "final_report")
     source.write(profile_df, "dataset_profile")
+    mark("write_outputs", stage_started)
 
     if args.apply_fixes:
+        stage_started = perf_counter()
         fix_service = FixService(config)
         fixed_df = fix_service.apply_fixes(
             df=df,
             issues_df=issues_df,
             mode=args.mode,
         )
+        mark("apply_fixes", stage_started)
+
+        stage_started = perf_counter()
         source.write(fixed_df, "fixed_transactions")
+        mark("write_fixed_output", stage_started)
 
     if args.report:
         print("=== REPORT ===")
@@ -127,6 +158,12 @@ def main():
     print("=== PIPELINE COMPLETED ===")
     print(f"Total issues: {len(issues_df)}")
     print(f"Output directory: {output_dir}")
+
+    if args.profile_runtime:
+        print()
+        print("=== RUNTIME PROFILE ===")
+        for stage_name, elapsed_seconds in runtime_marks:
+            print(f"{stage_name}: {elapsed_seconds:.2f}s")
 
 
 if __name__ == "__main__":

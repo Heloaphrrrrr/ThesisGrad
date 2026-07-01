@@ -37,6 +37,7 @@ model:
   anomaly_segment_column: category
   min_anomaly_segment_size: 500
   knn_neighbors: 5
+  max_reference_rows: 10000
   feature_z_threshold: 2.5
   conservative_confidence_threshold: 0.85
 

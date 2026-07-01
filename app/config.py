@@ -30,6 +30,7 @@ class PipelineConfig:
     min_anomaly_segment_size: int = 500
 
     knn_neighbors: int = 5
+    max_reference_rows: int = 10000
     feature_z_threshold: float = 2.5
 
     conservative_confidence_threshold: float = 0.85

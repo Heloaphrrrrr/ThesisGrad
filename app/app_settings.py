@@ -48,6 +48,7 @@ def load_config_from_yaml(path: str | None) -> PipelineConfig:
         anomaly_segment_column=model_cfg.get("anomaly_segment_column"),
         min_anomaly_segment_size=model_cfg.get("min_anomaly_segment_size", 500),
         knn_neighbors=model_cfg.get("knn_neighbors", 5),
+        max_reference_rows=model_cfg.get("max_reference_rows", 10000),
         feature_z_threshold=model_cfg.get("feature_z_threshold", 2.5),
         conservative_confidence_threshold=model_cfg.get(
             "conservative_confidence_threshold", 0.85

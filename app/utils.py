@@ -168,6 +168,19 @@ def add_ecommerce_derived_features(df: pd.DataFrame) -> pd.DataFrame:
         denom = out["quantity"].replace(0, np.nan)
         out["unit_price"] = out["price"] / denom
 
+    if {"category", "unit_price"}.issubset(out.columns):
+        category_base_price = (
+            out.groupby("category", dropna=False)["unit_price"]
+            .median()
+            .rename("base_unit_price_by_category")
+        )
+        out = out.join(category_base_price, on="category")
+
+        if "price_deviation_from_category" not in out.columns:
+            out["price_deviation_from_category"] = (
+                out["unit_price"] - out["base_unit_price_by_category"]
+            )
+
     if "age_group" not in out.columns and "age" in out.columns:
         out["age_group"] = pd.cut(
             out["age"],

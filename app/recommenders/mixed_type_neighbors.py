@@ -20,6 +20,13 @@ class MixedTypeNearestNeighbors:
         self.numeric_ranges: dict[str, float] = {}
 
     def fit(self, reference_df: pd.DataFrame):
+        max_rows = self.config.max_reference_rows
+        if max_rows and len(reference_df) > max_rows:
+            reference_df = reference_df.sample(
+                n=max_rows,
+                random_state=self.config.random_state,
+            )
+
         self.reference_df = reference_df.reset_index(drop=True).copy()
 
         context_cols = [

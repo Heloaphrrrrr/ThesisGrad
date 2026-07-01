@@ -114,6 +114,7 @@ Các feature phục vụ AI/data cleaning:
 ### Schema và import
 
 - `sql/postgresql_schema.sql`
+
   - chứa 4 bảng chính
   - có thêm bảng staging và data cleaning
 
@@ -127,15 +128,19 @@ Các feature phục vụ AI/data cleaning:
 ### Pipeline
 
 - `app/config.py`
+
   - thêm `source_query`
 
 - `app/app_settings.py`
+
   - load `source_query` từ YAML
 
 - `app/data_access/postgresql_source.py`
+
   - hỗ trợ đọc từ query join thay vì chỉ `SELECT * FROM table`
 
 - `app/utils.py`
+
   - thêm `add_ecommerce_derived_features()`
   - thêm `prepare_input_dataframe()`
 
@@ -229,6 +234,7 @@ Chưa kiểm tra end-to-end:
 ### Việc đã làm hôm nay
 
 - Đã xác nhận thông tin PostgreSQL thực tế:
+
   - host: `localhost`
   - port: `5432`
   - username: `postgres`
@@ -237,6 +243,7 @@ Chưa kiểm tra end-to-end:
 - Đã kiểm tra kết nối PostgreSQL thành công với database thật.
 
 - Đã kiểm tra dataset nguồn:
+
   - file: `data/customer_shopping_data.xlsx`
   - đọc được bằng Python/pandas
 
@@ -262,14 +269,17 @@ Chưa kiểm tra end-to-end:
 ### Nội dung patch chính
 
 - Tạo helper parse ngày e-commerce thống nhất:
+
   - `parse_ecommerce_invoice_date(..., dayfirst=True)`
 
 - Sửa import script để:
+
   - parse `invoice_date` đúng với dataset hiện tại
   - giữ `invoice_date_raw` để debug
   - raise lỗi rõ ràng nếu còn date parse fail
 
 - Sửa PostgreSQL write layer để:
+
   - không `replace` các bảng schema cố định
   - clear dữ liệu rồi `append`
   - sanitize toàn bộ numpy scalar trước khi ghi
@@ -281,6 +291,7 @@ Chưa kiểm tra end-to-end:
     - `fixed_transactions`
 
 - Sửa `app/cli.py` để ghi đúng bảng:
+
   - `fix_recommendations`
   - `fixed_transactions`
 
@@ -290,12 +301,15 @@ Chưa kiểm tra end-to-end:
 ### Các file tài liệu đã tạo hôm nay
 
 - `docs/end_to_end_manual_run.md`
+
   - hướng dẫn chạy manual end-to-end
 
 - `describe.md`
+
   - mô tả ý tưởng đồ án, flow, công nghệ, hướng tối ưu sau này
 
 - `explain.md`
+
   - giải thích vai trò các bảng trong database
 
 - `erd_text.md`
@@ -341,6 +355,7 @@ Lưu ý:
 ### Điều đã xác nhận chạy được
 
 - `transform_dataset(...)` chạy đúng:
+
   - `customers = 99457`
   - `products = 8`
   - `shopping_malls = 11`
@@ -349,6 +364,7 @@ Lưu ý:
 - `compileall` cho `app` và `scripts` chạy được
 
 - Sample pipeline đọc từ PostgreSQL với `LIMIT 1000` chạy được và ghi đúng vào các bảng:
+
   - `detected_issues`
   - `fix_recommendations`
   - `dataset_profile`
@@ -368,33 +384,40 @@ Mục tiêu sáng mai là chạy manual end-to-end theo tài liệu đã chuẩn
 ### Trình tự nên làm
 
 1. Đọc lại file:
+
    - `SESSION_CONTEXT.md`
    - `docs/end_to_end_manual_run.md`
 
 2. Kiểm tra DB hiện tại:
+
    - nếu cần sạch hoàn toàn thì cân nhắc tạo lại DB hoặc xóa dữ liệu cũ trước khi chạy full
    - nếu giữ DB hiện tại thì ít nhất nên chạy lại:
      - `sql/postgresql_schema.sql`
      - `sql/littlemigration.sql`
 
 3. Chạy lại import:
+
    - từ `data/customer_shopping_data.xlsx`
    - nạp lại `staging_customer_shopping_raw`, `customers`, `products`, `shopping_malls`, `transactions`
 
 4. Kiểm tra số lượng import:
+
    - `customers = 99457`
    - `products = 8`
    - `shopping_malls = 11`
    - `transactions = 99457`
 
 5. Chạy sample pipeline trước:
+
    - `LIMIT 1000`
    - để xác nhận flow vẫn ổn trong buổi sáng mai
 
 6. Sau đó mới chạy full pipeline:
+
    - `python -m app.cli --source postgres ... --apply-fixes`
 
 7. Kiểm tra output sau full run:
+
    - `detected_issues`
    - `fix_recommendations`
    - `dataset_profile`
@@ -421,6 +444,7 @@ Bắt đầu step 1 theo end_to_end_manual_run.md
 ```
 
 là có thể tiếp tục ngay.
+
 ## Cap nhat ngay 2026-06-30
 
 ### Viec da xac nhan hom nay
@@ -557,3 +581,28 @@ Kiem tra labels cu va them ground truth cho I127711
 
 - He thong da on hon ve toc do va da co benchmark ro rang.
 - Buoc tiep theo neu can toi uu nua la di sau vao anomaly/recommendation, khong phai doc/ghi file.
+
+### Dieu chinh sau gop y cua thay
+
+- Khong tiep tuc dung cach toi uu bang cat mau:
+  - bo `max_reference_rows` khoi config va code
+  - bo `max_samples` khoi config
+- `MixedTypeNearestNeighbors` va `FeatureContributionAnalyzer` hien dung toan bo reference set, khong sample 10.000 dong nua.
+- `IsolationForest` duoc ep dung day du so dong cua tap fit trong moi model bang cach truyen `max_samples=n_rows` vao API cua scikit-learn. Day khong con la tham so cau hinh de cat mau; no dung de tranh mac dinh 256 mau cua scikit-learn.
+- Toi uu thay the hien tai:
+  - cache reference numeric/categorical da chuan hoa trong `MixedTypeNearestNeighbors`
+  - cache neighbor theo `row_id` va danh sach cot exclude de tranh tinh lai khi mot invoice co nhieu issue
+  - giu full data cho anomaly, feature explanation va recommendation
+
+### Mau chot hom nay
+
+- Da chot lai huong giai thich voi giang vien:
+  - PostgreSQL la noi luu du lieu chuan va ket qua cleaning
+  - AI khong chay truc tiep trong database
+  - pipeline doc du lieu tu PostgreSQL / CSV, xu ly ben ngoai, roi ghi ket qua tro lai DB
+- Da bo hoan toan cach toi uu bang sampling cho 3 khoi chinh:
+  - `IsolationForest`
+  - `FeatureContributionAnalyzer`
+  - `MixedTypeNearestNeighbors`
+- Da tao file huong dan chay end-to-end duy nhat cho thay:
+  - co phan chay CSV, inject loi, quan sat runtime, va chay voi PostgreSQL

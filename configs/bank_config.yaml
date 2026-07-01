@@ -4,7 +4,6 @@ id_column: transaction_id
 model:
   contamination: 0.08
   n_estimators: 200
-  max_samples: 256
   random_state: 42
   knn_neighbors: 5
   feature_z_threshold: 2.5

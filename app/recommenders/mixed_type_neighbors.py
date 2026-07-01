@@ -18,16 +18,13 @@ class MixedTypeNearestNeighbors:
         self.numeric_cols: list[str] = []
         self.categorical_cols: list[str] = []
         self.numeric_ranges: dict[str, float] = {}
+        self.numeric_ref_values: dict[str, np.ndarray] = {}
+        self.categorical_ref_values: dict[str, pd.Series] = {}
+        self._neighbor_cache: dict[tuple[str, tuple[str, ...]], pd.DataFrame] = {}
 
     def fit(self, reference_df: pd.DataFrame):
-        max_rows = self.config.max_reference_rows
-        if max_rows and len(reference_df) > max_rows:
-            reference_df = reference_df.sample(
-                n=max_rows,
-                random_state=self.config.random_state,
-            )
-
         self.reference_df = reference_df.reset_index(drop=True).copy()
+        self._neighbor_cache = {}
 
         context_cols = [
             col
@@ -47,12 +44,19 @@ class MixedTypeNearestNeighbors:
         ]
 
         self.numeric_ranges = {}
+        self.numeric_ref_values = {}
         for col in self.numeric_cols:
             values = pd.to_numeric(self.reference_df[col], errors="coerce")
             value_range = values.max() - values.min()
             self.numeric_ranges[col] = (
                 float(value_range) if pd.notna(value_range) else 0.0
             )
+            self.numeric_ref_values[col] = values.to_numpy(dtype=float)
+
+        self.categorical_ref_values = {
+            col: self.reference_df[col].astype("string").str.strip().str.casefold()
+            for col in self.categorical_cols
+        }
 
         return self
 
@@ -62,6 +66,11 @@ class MixedTypeNearestNeighbors:
 
         exclude = set(exclude_columns or [])
         row = row_df.iloc[0]
+        cache_key = self._cache_key(row, exclude)
+        cached = self._neighbor_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
         distances = np.zeros(len(self.reference_df), dtype=float)
         weights = 0
 
@@ -73,14 +82,14 @@ class MixedTypeNearestNeighbors:
             if pd.isna(row_value):
                 continue
 
-            ref_values = pd.to_numeric(self.reference_df[col], errors="coerce")
+            ref_values = self.numeric_ref_values[col]
             value_range = self.numeric_ranges.get(col, 0.0)
             if value_range == 0:
                 col_distance = (ref_values != row_value).astype(float)
             else:
-                col_distance = (ref_values - row_value).abs() / value_range
+                col_distance = np.abs(ref_values - row_value) / value_range
 
-            distances += col_distance.fillna(1.0).to_numpy(dtype=float)
+            distances += np.nan_to_num(col_distance, nan=1.0)
             weights += 1
 
         for col in self.categorical_cols:
@@ -92,9 +101,7 @@ class MixedTypeNearestNeighbors:
                 continue
 
             normalized_row = str(row_value).strip().casefold()
-            normalized_ref = (
-                self.reference_df[col].astype("string").str.strip().str.casefold()
-            )
+            normalized_ref = self.categorical_ref_values[col]
             col_distance = normalized_ref.ne(normalized_row).fillna(True).astype(float)
 
             distances += col_distance.to_numpy(dtype=float)
@@ -105,4 +112,13 @@ class MixedTypeNearestNeighbors:
 
         n_neighbors = min(self.config.knn_neighbors, len(self.reference_df))
         neighbor_indices = np.argsort(distances, kind="mergesort")[:n_neighbors]
-        return self.reference_df.iloc[neighbor_indices]
+        neighbors = self.reference_df.iloc[neighbor_indices]
+        self._neighbor_cache[cache_key] = neighbors
+        return neighbors
+
+    def _cache_key(self, row: pd.Series, exclude: set[str]) -> tuple[str, tuple[str, ...]]:
+        row_id = row.get(self.config.id_column)
+        if pd.isna(row_id):
+            row_id = tuple(row.astype("string").fillna("<NA>").tolist())
+
+        return str(row_id), tuple(sorted(exclude))

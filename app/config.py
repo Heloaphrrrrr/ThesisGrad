@@ -24,13 +24,11 @@ class PipelineConfig:
 
     contamination: float = 0.08
     n_estimators: int = 200
-    max_samples: int = 256
     random_state: int = 42
     anomaly_segment_column: Optional[str] = None
     min_anomaly_segment_size: int = 500
 
     knn_neighbors: int = 5
-    max_reference_rows: int = 10000
     feature_z_threshold: float = 2.5
 
     conservative_confidence_threshold: float = 0.85

@@ -24,7 +24,8 @@ class AnomalyDetector:
         return IsolationForest(
             n_estimators=self.config.n_estimators,
             contamination=self.config.contamination,
-            max_samples=min(self.config.max_samples, n_rows),
+            # Override sklearn's 256-row default so every tree uses the full fit set.
+            max_samples=n_rows,
             random_state=self.config.random_state,
         )
 

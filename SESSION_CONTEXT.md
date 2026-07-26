@@ -606,3 +606,56 @@ Kiem tra labels cu va them ground truth cho I127711
   - `MixedTypeNearestNeighbors`
 - Da tao file huong dan chay end-to-end duy nhat cho thay:
   - co phan chay CSV, inject loi, quan sat runtime, va chay voi PostgreSQL
+
+## Cap nhat ngay 2026-07-25 - Tien do hinh trong bao cao Word
+
+### File da ra soat
+
+- `docs/bao_cao_do_an_tot_nghiep.docx`
+- Chi ra soat va ghi nhan tien do, khong chinh sua noi dung file Word trong lan cap nhat nay.
+
+### Ket qua doi chieu
+
+- Tong so chu thich hinh trong bao cao: 29.
+- So doan co hinh/drawing da chen: 22.
+- So vi tri con ghi `VI TRI CHO HINH`: 7.
+- Hai cach dem khop nhau: `29 - 22 = 7`.
+
+### Bay hinh con cho
+
+1. `Hinh 2.2 - Cau truc mot Isolation Tree va do dai duong di`
+   - Tu thiet ke cay nhi phan nho.
+   - Minh hoa diem bat thuong co duong di ngan va nhom diem binh thuong co duong di dai.
+
+2. `Hinh 2.3 - Quan he giua do dai duong di chuan hoa va diem bat thuong`
+   - Ve do thi voi truc hoanh `E[h(x)]/c(psi)` va truc tung `s(x, psi)`.
+   - Danh dau vung bat thuong, vung chua ro quanh 0.5 va vung binh thuong.
+   - Co the tham khao Figure 2 trong `docs/Isolation_Forest.pdf`.
+
+3. `Hinh 4.10 - So do giai thich anomaly`
+   - Tu thiet ke luong:
+     `Ban ghi bat thuong -> So sanh tap tham chieu sach -> Do lech dac trung -> Cot nghi van`.
+
+4. `Hinh 4.11 - Luong goi y sua loi bang nearest neighbors`
+   - Tu thiet ke luong:
+     `Ban ghi loi -> Loai cot dang loi -> Tim ban ghi tuong tu -> Gia tri ung vien -> Khuyen nghi`.
+   - Co the dua tren `app/recommenders/mixed_type_neighbors.py`.
+
+5. `Hinh 4.13 - Anh terminal chay CLI`
+   - Chup PowerShell chay pipeline end-to-end.
+   - Nen hien cac tuy chon `--profile-runtime` va `--apply-fixes`, cung ket qua runtime theo stage.
+
+6. `Hinh 5.6 - So sanh du lieu truoc va sau fix`
+   - Tu tao bang 2-3 dong gom:
+     gia tri goc, loi phat hien, gia tri de xuat va gia tri sau sua.
+   - Uu tien dung cac vi du that tu bo sample dirty.
+
+7. `Hinh 5.7 - Bieu do runtime theo stage`
+   - Dung ket qua tu `--profile-runtime`.
+   - Co the chup terminal hoac ve bieu do cot, lam ro `run_pipeline` la stage ton nhieu thoi gian nhat.
+
+### Phan loai cong viec con lai
+
+- Hinh nen tu thiet ke: 2.2, 2.3, 4.10, 4.11 va 5.6.
+- Hinh can chay he thong de chup/lay so lieu: 4.13 va 5.7.
+- Hinh nen lam tiep theo: `Hinh 2.2`.

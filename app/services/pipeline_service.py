@@ -7,7 +7,6 @@ from app.validators.invalid_detector import InvalidDetector
 from app.validators.cross_field_validator import CrossFieldValidator
 from app.detectors.anomaly_detector import AnomalyDetector
 from app.detectors.feature_contribution import FeatureContributionAnalyzer
-from app.recommenders.missing_recommender import MissingRecommender
 from app.recommenders.invalid_recommender import InvalidRecommender
 from app.recommenders.anomaly_recommender import AnomalyRecommender
 from app.utils import severity_from_score, clamp_confidence
@@ -24,7 +23,6 @@ class DataCleaningPipelineService:
         self.anomaly_detector = AnomalyDetector(config)
         self.feature_analyzer = FeatureContributionAnalyzer(config)
 
-        self.missing_recommender = MissingRecommender(config)
         self.invalid_recommender = InvalidRecommender(config)
         self.anomaly_recommender = AnomalyRecommender(config)
 
@@ -40,8 +38,15 @@ class DataCleaningPipelineService:
         known_issues_df = pd.concat(known_issue_dfs, ignore_index=True)
 
         issue_row_ids = set()
+        known_issue_cells = set()
         if not known_issues_df.empty:
             issue_row_ids.update(known_issues_df["row_id"].tolist())
+            known_issue_cells.update(
+                zip(
+                    known_issues_df["row_id"],
+                    known_issues_df["column_name"],
+                )
+            )
 
         clean_df = df[~df[self.config.id_column].isin(issue_row_ids)].copy()
         if clean_df.empty:
@@ -82,6 +87,9 @@ class DataCleaningPipelineService:
             anomaly_confidence = clamp_confidence(abs(decision_score) * 5)
 
             for col in suspicious_cols:
+                if (row_id, col) in known_issue_cells:
+                    continue
+
                 current_value = row_df.iloc[0][col]
 
                 issue = IssueRecord(
@@ -114,7 +122,6 @@ class DataCleaningPipelineService:
         if all_issues.empty:
             return pd.DataFrame(columns=self.config.issue_output_columns)
 
-        self.missing_recommender.fit(clean_df)
         self.anomaly_recommender.fit(clean_df)
 
         for idx, issue in all_issues.iterrows():
@@ -128,10 +135,8 @@ class DataCleaningPipelineService:
                 continue
 
             if issue_type == "missing":
-                suggestion, confidence = self.missing_recommender.recommend(row_df, col)
-
-                all_issues.at[idx, "suggested_value"] = suggestion
-                all_issues.at[idx, "confidence"] = confidence
+                all_issues.at[idx, "suggested_value"] = None
+                all_issues.at[idx, "can_auto_fix"] = False
 
             elif issue_type == "invalid":
                 value = issue["current_value"]
@@ -143,6 +148,8 @@ class DataCleaningPipelineService:
 
                 all_issues.at[idx, "suggested_value"] = suggestion
                 all_issues.at[idx, "confidence"] = confidence
+                if suggestion is None or pd.isna(suggestion):
+                    all_issues.at[idx, "can_auto_fix"] = False
 
             elif issue_type == "anomaly":
                 suggestion, rec_confidence = self.anomaly_recommender.recommend(row_df, col)

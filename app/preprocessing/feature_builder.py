@@ -19,6 +19,13 @@ class FeatureBuilder:
         self.categorical_cols: List[str] = []
         self.preprocessor: ColumnTransformer | None = None
 
+    def _prepare_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        out = df.copy()
+        for col in self.numeric_cols:
+            if col in out.columns:
+                out[col] = pd.to_numeric(out[col], errors="coerce")
+        return out
+
     def fit(self, df: pd.DataFrame) -> "FeatureBuilder":
 
         # =========================
@@ -72,7 +79,7 @@ class FeatureBuilder:
         # =========================
         # 6. FIT
         # =========================
-        self.preprocessor.fit(df)
+        self.preprocessor.fit(self._prepare_features(df))
 
         return self
 
@@ -81,7 +88,7 @@ class FeatureBuilder:
         if self.preprocessor is None:
             raise ValueError("FeatureBuilder must be fitted first")
 
-        return self.preprocessor.transform(df)
+        return self.preprocessor.transform(self._prepare_features(df))
 
     def fit_transform(self, df: pd.DataFrame):
         self.fit(df)

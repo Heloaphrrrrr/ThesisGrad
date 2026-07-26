@@ -8,6 +8,9 @@ import pandas as pd
 def parse_ecommerce_invoice_date(series: pd.Series) -> pd.Series:
     text_series = series.astype("string").str.strip()
     iso_mask = text_series.str.match(r"^\d{4}-\d{1,2}-\d{1,2}").fillna(False)
+    excel_us_mask = text_series.str.match(
+        r"^\d{1,2}/\d{1,2}/\d{4}(?:\s|$)"
+    ).fillna(False)
 
     parsed = pd.Series(pd.NaT, index=series.index, dtype="datetime64[ns]")
     parsed.loc[iso_mask] = pd.to_datetime(
@@ -15,8 +18,15 @@ def parse_ecommerce_invoice_date(series: pd.Series) -> pd.Series:
         errors="coerce",
         dayfirst=False,
     )
-    parsed.loc[~iso_mask] = pd.to_datetime(
-        series.loc[~iso_mask],
+    parsed.loc[excel_us_mask] = pd.to_datetime(
+        series.loc[excel_us_mask],
+        errors="coerce",
+        dayfirst=False,
+    )
+
+    remaining_mask = ~(iso_mask | excel_us_mask)
+    parsed.loc[remaining_mask] = pd.to_datetime(
+        series.loc[remaining_mask],
         errors="coerce",
         dayfirst=True,
     )
@@ -169,8 +179,9 @@ def add_ecommerce_derived_features(df: pd.DataFrame) -> pd.DataFrame:
         out["unit_price"] = out["price"] / denom
 
     if {"category", "unit_price"}.issubset(out.columns):
+        numeric_unit_price = pd.to_numeric(out["unit_price"], errors="coerce")
         category_base_price = (
-            out.groupby("category", dropna=False)["unit_price"]
+            numeric_unit_price.groupby(out["category"], dropna=False)
             .median()
             .rename("base_unit_price_by_category")
         )
@@ -178,7 +189,7 @@ def add_ecommerce_derived_features(df: pd.DataFrame) -> pd.DataFrame:
 
         if "price_deviation_from_category" not in out.columns:
             out["price_deviation_from_category"] = (
-                out["unit_price"] - out["base_unit_price_by_category"]
+                numeric_unit_price - out["base_unit_price_by_category"]
             )
 
     if "age_group" not in out.columns and "age" in out.columns:

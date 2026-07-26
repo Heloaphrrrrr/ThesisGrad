@@ -131,6 +131,7 @@ def main():
     source.write(profile_df, "dataset_profile")
     mark("write_outputs", stage_started)
 
+# 3 chế độ auto, conservative, interactive
     if args.apply_fixes:
         stage_started = perf_counter()
         fix_service = FixService(config)
